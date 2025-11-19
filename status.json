@@ -1,27 +1,27 @@
 {
-  "last_checked": "2025-11-19T11:19:01Z",
+  "last_checked": "2025-11-19T12:30:52Z",
   "sites": {
-    "site_a": {
+    "横茶横葉のサイト": {
       "status": "正常稼働中",
       "detail": "サイトは正常に稼働しています。 (HTTP Code: 200) E1",
       "http_code": "200"
     },
-    "site_b": {
+    "ソフトウェア・素材 統合配布サイト YOKONOHA": {
       "status": "正常稼働中",
       "detail": "サイトは正常に稼働しています。 (HTTP Code: 200) E1",
       "http_code": "200"
     },
-    "site_c": {
+    "アプリ・ソフトウェア 最新情報発信専用サーバー": {
       "status": "正常稼働中",
       "detail": "サイトは正常に稼働しています。 (HTTP Code: 200) E1",
       "http_code": "200"
     },
-    "site_d": {
+    "[関連] 横井陽菜(よこいひな) Official Reference Site": {
       "status": "正常稼働中",
       "detail": "サイトは正常に稼働しています。 (HTTP Code: 200) E1",
       "http_code": "200"
     },
-    "site_e": {
+    "[関連] MIDORIha": {
       "status": "正常稼働中",
       "detail": "サイトは正常に稼働しています。 (HTTP Code: 200) E1",
       "http_code": "200"
