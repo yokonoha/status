@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <script>
+  (function(){
+    const origGet = Document.prototype.getElementById;
+    const slotNames = ['A','B','C','D','E'];
+
+    Document.prototype.getElementById = function(id){
+      if (id !== 'status-container') return origGet.call(this, id);
+      const real = origGet.call(this, id);
+      if (!real) return real;
+      if (real.__statusProxy) return real.__statusProxy;
+
+      // Create five slot divs (classes A..E) and attach to real container
+      const slots = slotNames.map(name => {
+        const el = document.createElement('div');
+        el.className = name + ' status-slot';
+        return el;
+      });
+
+      real.innerHTML = '';
+      slots.forEach(s => real.appendChild(s));
+
+      let appendIndex = 0;
+      const proxy = {
+        set innerHTML(val){
+          if (val === ''){
+            // clear slots and reset index
+            slots.forEach(s => s.innerHTML = '');
+            appendIndex = 0;
+            real.innerHTML = '';
+            slots.forEach(s => real.appendChild(s));
+          } else {
+            real.innerHTML = val;
+          }
+        },
+        get innerHTML(){ return real.innerHTML; },
+        appendChild(node){
+          const target = slots[Math.min(appendIndex, slots.length - 1)];
+          target.appendChild(node);
+          appendIndex++;
+          return node;
+        },
+        // basic passthroughs in case other code expects DOM methods
+        addEventListener: (...args) => real.addEventListener(...args),
+        removeEventListener: (...args) => real.removeEventListener(...args)
+      };
+
+      real.__statusProxy = proxy;
+      return proxy;
+    };
+
+  })();
+  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>システム実行状況 - 横茶横葉のサイト メンテナンスルーム</title>
+    <meta name="description" content="横茶横葉が関係しているサイトの状態を閲覧できる自動運営サービスです。アクセス障害が発生しているかどうかをご確認いただけます。">
+    <meta name="keywords" content="横茶横葉, サイト, SystemUptime, Uptime, 最新情報">
+    <link rel="stylesheet" href="fsoverride.css">
+</head>
+<style>
+  #status-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;           /* スロット間の隙間 */
+    width: 100%;
+    box-sizing: border-box;
+    align-items: stretch; /* 幅を揃える */
+    margin: 0;
+    padding: 0;
+}
+
+.status-slot {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    /* padding はここで上書きせず、.A〜.E の設定（fsoverride.css）に任せます */
+    margin: 0;
+}
+
+/* スロット内に追加される .status-box が独自の背景や余白を持たないようにする */
+.status-slot > .status-box {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* モバイルでは隙間を少し小さく */
+@media screen and (max-width: 767px) {
+    #status-container { gap: 12px; }
+}
+</style>
+<body>
+  <header>
+    <nav>
+      <a href="./index.html">メインへ戻る</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="main">
+      <div class="R">
+        <h3>システム運営状況確認サイト</h3>
+        <p>横茶横葉の管理するサイトのアクセス障害等を自動で検知してお知らせ致します。</p>
+      </div>
+<div class="G">      <p>最終チェック日時 (JST): <span id="last-checked">Loading...</span></p></div>
+
+
+    <div id="status-container">Loading site statuses...</div>
+
+      
+    </section>
+
+          <div class="sidebar-box">
+       <p> ローカル時刻 by <a href="https://github.com/yokonoha/timesysre">TimesysRe</a></p>
+<p><span id="year"></span>/<span id="month"></span>/<span id="date"></span> <span id="day"></span></p>
+
+<h2><span id="hour"></span>:<span id="min"></span> <small><span id="sec"></span></small></h2>
+    <div class="mojiban" style="display: flex; justify-content: center; align-items: center; width: 10vw; height: 10vw; max-width: 900px; border-radius: 50%; border-style: solid; border-width: 2px; background-color: #111; border-color: #fff; ">
+        <div class="hosei" style="width: 100%; height: 100%; position: relative;">
+            <div class="mijikaihari" style="position: absolute; left: 50%; bottom: 50%; transform-origin: bottom; transform: translateX(-50%); transition-timing-function: steps(1); width: 3%; height: 25%; background-color: #12f32a; border-radius: 8vw;"></div>
+            <div class="nagaihari" style="position: absolute; left: 50%; bottom: 50%; transform-origin: bottom; transform: translateX(-50%); transition-timing-function: steps(1); width: 4%; height: 45%; background-color: aquamarine; border-radius: 6vw;"></div>
+            <div class="byoushin" style="position: absolute; left: 50%; bottom: 50%; transform-origin: bottom; transform: translateX(-50%); transition-timing-function: steps(1); width: 1%; height: 50%; background-color: coral; border-radius: 3vw;"></div>
+        </div>
+    </div>   
+    <p><small>Analog clock by aclsys</small></p>  
+</div>
+  </main>
+
+
+      
+  <footer>
+      <h3>横茶横葉のサイト</h3>
+    <p>&copy; 2025 Y.Yokoha All rights reserved.</p>
+    <a href="https://yokonoha.github.io/readme"><p>利用規約/Terms of Services</p></a>
+    <p><small>Thanks for All Visitors & Contributors!</small></p> 
+    <p>このサイトは<a href="https://github.com/yokonoha/FSLinear">FSLinear</a>のスタイルを一部使用しています。</p>
+    
+</footer>
+
+</body>
+<script src="./timesysre.js"></script>
+<script src="./aclsys.js"></script>
+<script>
+        fetch('status.json')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('last-checked').textContent = new Date(data.last_checked).toLocaleString('ja-JP', { timeZone: 'JST' }) + ' JST';
+                const container = document.getElementById('status-container');
+                container.innerHTML = ''; // ロードメッセージをクリア
+
+                // sitesオブジェクト内の各サイトをループ処理
+                for (const siteId in data.sites) {
+                    const siteData = data.sites[siteId];
+                    
+                    const box = document.createElement('div');
+                    box.className = 'status-box';
+                    
+                    const statusClass = siteData.status.replace(/\s/g, ''); // CSSクラス用にスペースを削除
+                    
+                    box.innerHTML = `
+                        <h2>${siteId.toUpperCase()}</h2>
+                        <p>現在の状態: <span class="status-main ${statusClass}">${siteData.status}</span></p>
+                        <p>詳細情報: ${siteData.detail}</p>
+                        <p>レスポンスコード: ${siteData.http_code}</p>
+                    `;
+                    container.appendChild(box);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading status data:', error);
+                document.getElementById('status-container').innerHTML = '<p style="color:red;">ステータスデータの読み込みに失敗しました。</p>';
+            });
+    </script>
+</html>
+
+
+
+
+
+
+
+

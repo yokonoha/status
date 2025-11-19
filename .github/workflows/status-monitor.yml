@@ -1,0 +1,90 @@
+name: yokoha status monitor
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  check_all_sites:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Git for commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: junkai
+        id: fetch
+        run: |
+          set -euo pipefail
+
+          # 巡回対象サイトリスト (必ず5サイト)
+          SITES=(
+            "横茶横葉のサイト|https://yokonoha.github.io"
+            "ソフトウェア・素材 統合配布サイト YOKONOHA|https://yokonoha.pages.dev"
+            "アプリ・ソフトウェア 最新情報発信専用サーバー|https://app-sv-cnt.pages.dev"
+            "[関連] 横井陽菜(よこいひな) Official Reference Site|https://hina-yokoi.pages.dev"
+            "[関連] MIDORIha|https://midoriha.pages.dev"
+          )
+
+          # 初期JSON作成
+          echo '{ "last_checked": "", "sites": {} }' > temp_status.json
+
+          # 最終チェック時刻を記録
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          jq --arg t "$TIMESTAMP" '.last_checked = $t' temp_status.json > temp_status_updated.json && mv temp_status_updated.json temp_status.json
+
+          for entry in "${SITES[@]}"; do
+            IFS='|' read -r SITE_ID SITE_URL <<< "$entry"
+
+            echo "--- Checking $SITE_ID ($SITE_URL) ---"
+
+            # follow redirects (-L) and increase timeout (--max-time)
+            HTML_CONTENT=$(curl -s -L --max-time 20 "$SITE_URL" || echo "")
+            HTTP_CODE=$(curl -s -L -o /dev/null -w "%{http_code}" --max-time 20 "$SITE_URL" || echo "000")
+
+            STATUS_MAIN="異常検知"
+            STATUS_DETAIL="サイトへのアクセスに失敗しました (HTTP Code: $HTTP_CODE)"
+
+            if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -le 399 ]; then
+              # grep/sed may return non-zero when no match — suppress that with || true
+              STATUS_TAG=$(printf '%s' "$HTML_CONTENT" | grep -o '<meta name="system-status" [^>]*>' || true)
+
+              if [ -z "$STATUS_TAG" ]; then
+                STATUS_MAIN="正常稼働中"
+                STATUS_DETAIL="サイトは正常に稼働しています。 (HTTP Code: $HTTP_CODE) E1"
+              else
+                STATUS_MAIN=$(printf '%s' "$STATUS_TAG" | sed -n 's/.*content="\([^"]*\)".*/\1/p' || true)
+                STATUS_DETAIL=$(printf '%s' "$STATUS_TAG" | sed -n 's/.*data-detail="\([^"]*\)".*/\1/p' || true)
+
+                STATUS_MAIN=${STATUS_MAIN:-"Unknown"}
+                STATUS_DETAIL=${STATUS_DETAIL:-"詳細情報なし"}
+              fi
+            fi
+
+            # jq: pass http code as a safe string arg
+            jq --arg id "$SITE_ID" \
+               --arg main "$STATUS_MAIN" \
+               --arg detail "$STATUS_DETAIL" \
+               --arg http "$HTTP_CODE" \
+               '.sites[$id] = {status: $main, detail: $detail, http_code: $http}' \
+               temp_status.json > temp_status_updated.json && mv temp_status_updated.json temp_status.json
+
+            echo "  -> Status: $STATUS_MAIN, Detail: $STATUS_DETAIL"
+
+          done
+
+          mv temp_status.json status.json
+
+      - name: Commit and Push Updated Status
+        run: |
+          # JSON の差分チェックを行わず、常にコミット＆プッシュします。
+          git add status.json
+          git commit --allow-empty -m "Auto status update: $(date -u +%Y-%m-%d)"
+          git push
+          echo "status.json をコミット・プッシュしました。"
