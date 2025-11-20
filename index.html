@@ -97,13 +97,14 @@
 <body>
   <header>
     <nav>
-      <a href="./index.html">メインへ戻る</a>
+      <a href="https://yokonoha.github.io">メインへ戻る</a>
     </nav>
   </header>
 
   <main class="container">
     <section class="main">
       <div class="R">
+<img src="./statusimg.png" style="width:50vw; max-width:700px; alt="サービスシステムステータスモニター"" id="clk">
         <h3>システム運営状況確認サイト</h3>
         <p>横茶横葉の管理するサイトのアクセス障害等を自動で検知してお知らせ致します。</p>
       </div>
@@ -175,6 +176,7 @@
                 console.error('Error loading status data:', error);
                 document.getElementById('status-container').innerHTML = '<p style="color:red;">ステータスデータの読み込みに失敗しました。</p>';
             });
+
     </script>
 </html>
 
