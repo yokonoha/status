@@ -12,7 +12,7 @@
       if (!real) return real;
       if (real.__statusProxy) return real.__statusProxy;
 
-      // Create five slot divs (classes A..E) and attach to real container
+
       const slots = slotNames.map(name => {
         const el = document.createElement('div');
         el.className = name + ' status-slot';
@@ -26,7 +26,7 @@
       const proxy = {
         set innerHTML(val){
           if (val === ''){
-            // clear slots and reset index
+
             slots.forEach(s => s.innerHTML = '');
             appendIndex = 0;
             real.innerHTML = '';
@@ -42,7 +42,7 @@
           appendIndex++;
           return node;
         },
-        // basic passthroughs in case other code expects DOM methods
+
         addEventListener: (...args) => real.addEventListener(...args),
         removeEventListener: (...args) => real.removeEventListener(...args)
       };
@@ -55,8 +55,8 @@
   </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>システム実行状況 - 横茶横葉のサイト メンテナンスルーム</title>
-    <meta name="description" content="横茶横葉が関係しているサイトの状態を閲覧できる自動運営サービスです。アクセス障害が発生しているかどうかをご確認いただけます。">
+  <title>システムステータスモニター - 横茶横葉のサイト メンテナンスルーム</title>
+    <meta name="description" content="横茶横葉が関係しているサイトの状態を閲覧できる完全自動運営サービスです。各サービスのシステムの稼働状況をご確認いただけます。">
     <meta name="keywords" content="横茶横葉, サイト, SystemUptime, Uptime, 最新情報">
     <link rel="stylesheet" href="fsoverride.css">
 </head>
@@ -64,10 +64,10 @@
   #status-container {
     display: flex;
     flex-direction: column;
-    gap: 16px;           /* スロット間の隙間 */
+    gap: 16px;          
     width: 100%;
     box-sizing: border-box;
-    align-items: stretch; /* 幅を揃える */
+    align-items: stretch;
     margin: 0;
     padding: 0;
 }
@@ -76,11 +76,10 @@
     display: block;
     width: 100%;
     box-sizing: border-box;
-    /* padding はここで上書きせず、.A〜.E の設定（fsoverride.css）に任せます */
     margin: 0;
 }
 
-/* スロット内に追加される .status-box が独自の背景や余白を持たないようにする */
+
 .status-slot > .status-box {
     margin: 0;
     padding: 0;
@@ -89,7 +88,7 @@
     box-sizing: border-box;
 }
 
-/* モバイルでは隙間を少し小さく */
+
 @media screen and (max-width: 767px) {
     #status-container { gap: 12px; }
 }
@@ -152,22 +151,22 @@
             .then(data => {
                 document.getElementById('last-checked').textContent = new Date(data.last_checked).toLocaleString('ja-JP', { timeZone: 'JST' }) + ' JST';
                 const container = document.getElementById('status-container');
-                container.innerHTML = ''; // ロードメッセージをクリア
+                container.innerHTML = ''; 
 
-                // sitesオブジェクト内の各サイトをループ処理
+
                 for (const siteId in data.sites) {
                     const siteData = data.sites[siteId];
                     
                     const box = document.createElement('div');
                     box.className = 'status-box';
                     
-                    const statusClass = siteData.status.replace(/\s/g, ''); // CSSクラス用にスペースを削除
+                    const statusClass = siteData.status.replace(/\s/g, ''); 
                     
                     box.innerHTML = `
                         <h2>${siteId.toUpperCase()}</h2>
                         <p>現在の状態: <span class="status-main ${statusClass}">${siteData.status}</span></p>
                         <p>詳細情報: ${siteData.detail}</p>
-                        <p>レスポンスコード: ${siteData.http_code}</p>
+                        <p>RES: ${siteData.http_code}</p>
                     `;
                     container.appendChild(box);
                 }
