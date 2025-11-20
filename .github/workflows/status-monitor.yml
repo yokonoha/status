@@ -28,8 +28,8 @@ jobs:
             "横茶横葉のサイト|https://yokonoha.github.io"
             "ソフトウェア・素材 統合配布サイト YOKONOHA|https://yokonoha.pages.dev"
             "アプリ・ソフトウェア 最新情報発信専用サーバー|https://app-sv-cnt.pages.dev"
-            "[関連] 横井陽菜(よこいひな) Official Reference Site|https://hina-yokoi.pages.dev"
-            "[関連] MIDORIha|https://midoriha.pages.dev"
+            "Caffeine Apps Suite|https://caffeineapps.pages.dev"
+            "Official Reference Site (Hina Yokoi)|https://hina-yokoi.pages.dev"
           )
 
           # 初期JSON作成
@@ -48,8 +48,8 @@ jobs:
             HTML_CONTENT=$(curl -s -L --max-time 20 "$SITE_URL" || echo "")
             HTTP_CODE=$(curl -s -L -o /dev/null -w "%{http_code}" --max-time 20 "$SITE_URL" || echo "000")
 
-            STATUS_MAIN="異常検知"
-            STATUS_DETAIL="サイトへのアクセスに失敗しました (HTTP Code: $HTTP_CODE)"
+            STATUS_MAIN="異常検知 - サーバーが応答していません"
+            STATUS_DETAIL="サイトへのアクセスに失敗しました。サービスに何らかの不具合が発生している可能性があります。 (HTTP Code: $HTTP_CODE)"
 
             if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -le 399 ]; then
               # grep/sed may return non-zero when no match — suppress that with || true
@@ -64,6 +64,9 @@ jobs:
 
                 STATUS_MAIN=${STATUS_MAIN:-"Unknown"}
                 STATUS_DETAIL=${STATUS_DETAIL:-"詳細情報なし"}
+
+                STATUS_MAIN="${STATUS_MAIN} | 正常稼働中"
+                STATUS_DETAIL="${STATUS_DETAIL} |||| 巡回システムからの評価(Evaluation): サイトは正常に稼働しています。 (HTTP Code: $HTTP_CODE)"
               fi
             fi
 
