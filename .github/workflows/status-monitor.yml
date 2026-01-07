@@ -26,7 +26,7 @@ jobs:
           # 巡回対象サイトリスト (必ず5サイト)
           SITES=(
             "横茶横葉のサイト|https://yokonoha.github.io"
-            "ソフトウェア・素材 統合配布サイト YOKONOHA|https://yokonoha.pages.dev"
+            "ソフトウェア・素材 統合配布サイト YOKONOHA|https://yokonoha.pages.dev/software"
             "アプリ・ソフトウェア 最新情報発信専用サーバー|https://app-sv-cnt.pages.dev"
             "Caffeine Apps Suite|https://caffeineapps.pages.dev"
             "Official Reference Site (Hina Yokoi)|https://hina-yokoi.pages.dev"
