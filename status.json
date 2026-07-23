@@ -1,5 +1,5 @@
 {
-  "last_checked": "2026-07-23T11:10:35Z",
+  "last_checked": "2026-07-23T14:02:35Z",
   "sites": {
     "横茶横葉のサイト": {
       "status": "正常稼働中",
@@ -17,9 +17,9 @@
       "http_code": "200"
     },
     "Caffeine Apps Suite": {
-      "status": "正常稼働中",
-      "detail": "サイトは正常に稼働しています。 (HTTP Code: 200) E1",
-      "http_code": "200"
+      "status": "異常検知 - サーバーが応答していません",
+      "detail": "サイトへのアクセスに失敗しました。サービスに何らかの不具合が発生している可能性があります。 (HTTP Code: 000000)",
+      "http_code": "000000"
     },
     "MinatsukiTone": {
       "status": "正常稼働中",
